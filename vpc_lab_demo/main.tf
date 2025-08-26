@@ -133,7 +133,7 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"]
 }
 
-# Terraform Resource Block - To Build EC2 instance in Public Subnet
+# Resource Block Lab
 resource "aws_instance" "web_server" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t3.micro"
@@ -141,4 +141,42 @@ resource "aws_instance" "web_server" {
   tags = {
     Name = "Ubuntu EC2 Server"
   }
+}
+
+resource "aws_s3_bucket" "my-maksio003-bucket" {
+  depends_on = [ random_id.random-phrase ]
+  bucket = "my-maksio003-bucket-${random_id.random-phrase.hex}"
+
+  tags = {
+    Name        = "My bucket"
+    Environment = "Dev"
+  }
+}
+
+resource "aws_s3_bucket_acl" "my-maksio003-bucket-acl" {
+  bucket = aws_s3_bucket.my-maksio003-bucket.id
+  acl    = "private"
+}
+
+resource "aws_security_group" "my-security-group" {
+  name        = "my-security-group"
+  description = "My test security group"
+  vpc_id      = aws_vpc.vpc.id
+
+  ingress {
+    description = "Allow 443 from the internet"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "My security group"
+    Purpuse = "Intro to resource block lab"
+  }
+}
+
+resource "random_id" "random-phrase" {
+  byte_length = 8
 }
