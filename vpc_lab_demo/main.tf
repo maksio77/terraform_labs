@@ -4,6 +4,7 @@ provider "aws" {
 }
 
 #Retrieve the list of AZs in the current AWS region
+#Data block
 data "aws_availability_zones" "available" {}
 data "aws_region" "current" {}
 
@@ -15,6 +16,7 @@ resource "aws_vpc" "vpc" {
     Name        = var.vpc_name
     Environment = "demo_environment"
     Terraform   = "true"
+    Region = data.aws_region.current.name
   }
 }
 
